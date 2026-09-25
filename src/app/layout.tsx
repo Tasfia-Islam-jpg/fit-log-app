@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import Nav from "@/components/Nav";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FitLog",
@@ -16,7 +18,14 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Nav />
+
         {children}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          theme="dark"
+        />
       </body>
     </html>
   );

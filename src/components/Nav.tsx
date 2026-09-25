@@ -1,60 +1,107 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
-import Image from "next/image"; 
+import { useEffect, useState } from "react";
+
+const PLAN_KEY = "fitlog-plan";
+const SAVED_KEY = "fitlog-saved";
 
 export default function Nav() {
+  const [planCount, setPlanCount] = useState(0);
+  const [savedCount, setSavedCount] = useState(0);
+
+  const updateCounts = () => {
+    const plan = JSON.parse(
+      localStorage.getItem(PLAN_KEY) || "[]"
+    );
+
+    const saved = JSON.parse(
+      localStorage.getItem(SAVED_KEY) || "[]"
+    );
+
+    setPlanCount(plan.length);
+    setSavedCount(saved.length);
+  };
+
+  useEffect(() => {
+    updateCounts();
+
+    window.addEventListener(
+      "fitlog-storage",
+      updateCounts
+    );
+
+    return () => {
+      window.removeEventListener(
+        "fitlog-storage",
+        updateCounts
+      );
+    };
+  }, []);
+
   return (
     <nav className="border-b border-[#24262d] bg-[#0b0c0f]">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png"
-           alt="FitLog Logo" 
-           width={28} 
-           height={28} />
+        <Link
+          href="/"
+          className="flex items-center gap-2"
+        >
+          <Image
+            src="/logo.png"
+            alt="FitLog"
+            width={24}
+            height={24}
+          />
 
-          <span className="text-sm font-bold tracking-wide text-white">
+          <span className="text-sm font-black text-white">
             FITLOG
           </span>
         </Link>
 
         {/* Navigation */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-6">
+
           <Link
             href="/"
-            className="rounded-full bg-[#ccff00] px-5 py-2 text-xs font-bold text-black"
+            className="text-[10px] text-gray-300 transition hover:text-[#ccff00]"
           >
-            WORKOUT
+            Workouts
           </Link>
 
           <Link
             href="/my-plan"
-            className="rounded-full px-5 py-2 text-xs font-medium text-gray-400 transition hover:text-white"
+            className="text-[10px] text-gray-300 transition hover:text-[#ccff00]"
           >
-            MY PLAN
+            My Plan
           </Link>
+
         </div>
 
-        {/* Counters */}
-        <div className="flex items-center gap-3">
+        {/* Counts */}
+        <div className="flex items-center gap-5">
 
           <Link
             href="/my-plan"
-            className="flex items-center gap-2 text-xs text-gray-300"
+            className="flex items-center gap-2 text-[9px] text-gray-400"
           >
             <span>Plan</span>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#ccff00] px-1.5 text-[10px] font-bold text-black">
-              0
+
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ccff00] px-1 text-[8px] font-bold text-black">
+              {planCount}
             </span>
           </Link>
 
           <Link
             href="/my-plan"
-            className="flex items-center gap-2 text-xs text-gray-300"
+            className="flex items-center gap-2 text-[9px] text-gray-400"
           >
             <span>Saved</span>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-[#ccff00] px-1.5 text-[10px] font-bold text-[#ccff00]">
-              0
+
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full border border-[#24262d] px-1 text-[8px] text-gray-400">
+              {savedCount}
             </span>
           </Link>
 
