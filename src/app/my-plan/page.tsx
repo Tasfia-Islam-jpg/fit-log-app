@@ -1,15 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { usePlan } from "@/context/PlanContext";
 import PlanCard from "@/components/PlanCard";
 
 type Tab = "plan" | "saved";
+type SortOption = "duration" | "calories" | "rating";
 
 export default function MyPlanPage() {
   const [tab, setTab] = useState<Tab>("plan");
+
+  // Sort By
+  const [sortBy, setSortBy] = useState<SortOption>("duration");
 
   const {
     plan,
@@ -31,6 +35,22 @@ export default function MyPlanPage() {
   );
 
   const list = tab === "plan" ? plan : saved;
+
+  // Sort the current list
+  const sortedList = useMemo(() => {
+    return [...list].sort((a, b) => {
+      if (sortBy === "duration") {
+        return a.duration - b.duration;
+      }
+
+      if (sortBy === "calories") {
+        return a.caloriesBurned - b.caloriesBurned;
+      }
+
+      // Rating: highest rating first
+      return b.rating - a.rating;
+    });
+  }, [list, sortBy]);
 
   function handleRemove(id: number) {
     if (tab === "plan") {
@@ -57,6 +77,7 @@ export default function MyPlanPage() {
   return (
     <main className="min-h-[calc(100vh-140px)] bg-[#090a0d]">
       <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+
         {/* Header */}
         <section>
           <h1 className="text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
@@ -71,7 +92,7 @@ export default function MyPlanPage() {
         {/* Metrics */}
         <section className="mt-6 overflow-hidden rounded-md border border-[#252830] bg-[#111318]">
           <div className="grid grid-cols-3">
-            {/* Exercises */}
+
             <div className="border-r border-[#252830] px-3 py-4 text-center sm:px-6 sm:py-5">
               <p className="text-xl font-black leading-none text-white sm:text-2xl">
                 {plan.length}
@@ -82,7 +103,6 @@ export default function MyPlanPage() {
               </p>
             </div>
 
-            {/* Minutes */}
             <div className="border-r border-[#252830] px-3 py-4 text-center sm:px-6 sm:py-5">
               <p className="text-xl font-black leading-none text-white sm:text-2xl">
                 {minutes}
@@ -93,7 +113,6 @@ export default function MyPlanPage() {
               </p>
             </div>
 
-            {/* Calories */}
             <div className="px-3 py-4 text-center sm:px-6 sm:py-5">
               <p className="text-xl font-black leading-none text-white sm:text-2xl">
                 {calories}
@@ -103,42 +122,89 @@ export default function MyPlanPage() {
                 Calories
               </p>
             </div>
+
           </div>
         </section>
 
-        {/* Tabs */}
-        <div className="mt-6 flex items-center gap-2 border-b border-[#252830]">
-          <button
-            type="button"
-            onClick={() => setTab("plan")}
-            className={`relative px-4 pb-3 text-[11px] font-bold uppercase tracking-wide transition ${
-              tab === "plan"
-                ? "text-[#ccff00]"
-                : "text-gray-500 hover:text-gray-300"
-            }`}
-          >
-            Today's Plan
+        {/* Tabs + Sort */}
+        <div className="mt-6 flex items-end justify-between border-b border-[#252830]">
 
-            {tab === "plan" && (
-              <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#ccff00]" />
-            )}
-          </button>
+          {/* Tabs */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTab("plan")}
+              className={`relative px-4 pb-3 text-[11px] font-bold uppercase tracking-wide transition ${
+                tab === "plan"
+                  ? "text-[#ccff00]"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              Today's Plan
 
-          <button
-            type="button"
-            onClick={() => setTab("saved")}
-            className={`relative px-4 pb-3 text-[11px] font-bold uppercase tracking-wide transition ${
-              tab === "saved"
-                ? "text-[#ccff00]"
-                : "text-gray-500 hover:text-gray-300"
-            }`}
-          >
-            Saved
+              {tab === "plan" && (
+                <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#ccff00]" />
+              )}
+            </button>
 
-            {tab === "saved" && (
-              <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#ccff00]" />
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={() => setTab("saved")}
+              className={`relative px-4 pb-3 text-[11px] font-bold uppercase tracking-wide transition ${
+                tab === "saved"
+                  ? "text-[#ccff00]"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              Saved
+
+              {tab === "saved" && (
+                <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#ccff00]" />
+              )}
+            </button>
+          </div>
+
+          {/* C1 - Sort Dropdown */}
+          <div className="relative mb-2">
+            <select
+              value={sortBy}
+              onChange={(event) =>
+                setSortBy(
+                  event.target.value as SortOption
+                )
+              }
+              aria-label="Sort workouts"
+              className="h-9 appearance-none rounded-md border border-[#2a2d34] bg-[#111318] px-3 pr-8 text-[10px] font-bold text-gray-300 outline-none transition hover:border-[#3a3e47] focus:border-[#ccff00]"
+            >
+              <option value="duration">
+                Sort By: Duration
+              </option>
+
+              <option value="calories">
+                Sort By: Calories
+              </option>
+
+              <option value="rating">
+                Sort By: Rating
+              </option>
+            </select>
+
+            {/* Chevron */}
+            <svg
+              className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
         </div>
 
         {/* Loading */}
@@ -146,13 +212,13 @@ export default function MyPlanPage() {
           <div className="flex min-h-48 items-center justify-center">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <span className="loading loading-spinner loading-sm text-[#ccff00]" />
-              Loading workouts…
+              Loading workouts...
             </div>
           </div>
         )}
 
-        {/* Empty */}
-        {loaded && list.length === 0 && (
+        {/* Empty State */}
+        {loaded && sortedList.length === 0 && (
           <div className="mt-5 flex min-h-64 flex-col items-center justify-center rounded-md border border-dashed border-[#252830] bg-[#111318] px-6 text-center">
             <p className="text-sm font-black uppercase tracking-wide text-white">
               Nothing Here Yet
@@ -172,9 +238,9 @@ export default function MyPlanPage() {
         )}
 
         {/* Workout List */}
-        {loaded && list.length > 0 && (
+        {loaded && sortedList.length > 0 && (
           <div className="mt-4 space-y-2">
-            {list.map((item) => (
+            {sortedList.map((item) => (
               <PlanCard
                 key={item.id}
                 item={item}
