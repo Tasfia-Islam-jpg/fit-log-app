@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import { PlanProvider } from "@/context/PlanContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
@@ -17,9 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Nav />
+        <PlanProvider>
+          <Nav />
 
-        {children}
+          {children}
+
+          <Footer />
+        </PlanProvider>
 
         <ToastContainer
           position="top-right"
