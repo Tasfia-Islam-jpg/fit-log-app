@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Workout } from "@/lib/types";
+import type { Workout } from "@/types/workout";
 
 export type PlanItem = Workout & { done?: boolean };
 
