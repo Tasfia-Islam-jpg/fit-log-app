@@ -24,15 +24,18 @@ export default function MyPlanPage() {
     toggleDone,
   } = usePlan();
 
-  const minutes = plan.reduce(
-    (sum, workout) => sum + workout.duration,
-    0
-  );
+ const statsList = tab === "plan" ? plan : saved;
 
-  const calories = plan.reduce(
-    (sum, workout) => sum + workout.caloriesBurned,
-    0
-  );
+const minutes = statsList.reduce(
+  (sum, workout) => sum + workout.duration,
+  0
+);
+
+const calories = statsList.reduce(
+  (sum, workout) => sum + workout.caloriesBurned,
+  0
+);
+
 
   const list = tab === "plan" ? plan : saved;
 
@@ -95,7 +98,7 @@ export default function MyPlanPage() {
 
             <div className="border-r border-[#252830] px-3 py-4 text-center sm:px-6 sm:py-5">
               <p className="text-xl font-black leading-none text-white sm:text-2xl">
-                {plan.length}
+                {statsList.length}
               </p>
 
               <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-gray-500 sm:text-[10px]">
